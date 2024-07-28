@@ -5,36 +5,61 @@
 # NOTES:
 #   - We are using WineHQ.
 #
+# VERSIONS:
+# latest - Latest stable version from TOSEC Project Homepage
+# beta - Crashdisk beta version
+
 ARG DOCKER_IMAGE_VERSION=1.0.0-3.6.1
 
 # Define software download URLs.
 ARG ADFWORKSHOP_URL=https://www.tosecdev.org/downloads/category/25-adf-workshop
 ARG ADFWORKSHOP_BASEURL=https://www.tosecdev.org
-ARG ADFWORKSHOP_VERSION=latest
+ARG ADFWORKSHOP_VERSION=stable
+ARG ADFWORKSHOP_BETAURL=ftp://ftp@ftp.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Main%20program/ADF-Workshop_20220402.zip
+
 
 # Download ADF-Workshop.
 FROM alpine:3.17 AS adfw
 ARG ADFWORKSHOP_URL
 ARG ADFWORKSHOP_BASEURL
 ARG ADFWORKSHOP_VERSION
+ARG ADFWORKSHOP_BETAURL
+
 RUN \
     apk --no-cache add curl && \
-    if [ "$ADFWORKSHOP_VERSION" = "latest" ]; then FILTER='head -1'; else FILTER="grep $ADFWORKSHOP_VERSION"; fi && \
-    # Get latest version of ADF-Worksshop
-    ADFWORKSHOP_DOWNLOAD=$(curl ${ADFWORKSHOP_URL} | \
+    # Get desired version of ADF-Workshop
+    if [ "$ADFWORKSHOP_VERSION" = "beta" ]; then \
+        ADFWORKSHOP_DOWNLOAD=${ADFWORKSHOP_BETAURL} && \
+        echo "ADFWORKSHOP_DOWNLOAD=" ${ADFWORKSHOP_DOWNLOAD}; \
+    elif [ "$ADFWORKSHOP_VERSION" = "stable" ]; then \
+        ADFWORKSHOP_DOWNLOAD=$(curl ${ADFWORKSHOP_URL} | \
+            sed -n 's/.*href="\([^"]*\).*/\1/p' | \
+            grep -i ?download | \
+            sort -r -f -u | \
+            head -1) \
+            && \
+            echo "ADFWORKSHOP_DOWNLOAD=" ${ADFWORKSHOP_DOWNLOAD}; \
+    else \
+        ADFWORKSHOP_DOWNLOAD=$(curl ${ADFWORKSHOP_URL} | \
         sed -n 's/.*href="\([^"]*\).*/\1/p' | \
         grep -i ?download | \
         sort -r -f -u | \
-        $FILTER) \
+        grep $ADFWORKSHOP_VERSION) \
         && \
-    echo ADFWORKSHOP_DOWNLOAD=${ADFWORKSHOP_DOWNLOAD} && \
-    # Document Versions
-    echo "adf-workshop" $(basename ${ADFWORKSHOP_DOWNLOAD} .zip | cut -d ":" -f 2) >> /VERSIONS && \
-    # Download ADF-Workshop
+        echo "ADFWORKSHOP_DOWNLOAD=" ${ADFWORKSHOP_DOWNLOAD}; \
+    fi && \
+    # Document, download and extract the desired version of ADF-Workshop
     mkdir -p /defaults/ && \
-    curl --output /defaults/adf-workshop.zip "${ADFWORKSHOP_BASEURL}/${ADFWORKSHOP_DOWNLOAD}" && \
-    unzip /defaults/adf-workshop.zip -d /opt/
-
+    if [ "$ADFWORKSHOP_VERSION" = "beta" ]; then \
+        echo "adf-workshop" $(basename ${ADFWORKSHOP_DOWNLOAD} .zip | cut -d "_" -f 2) >> /VERSIONS && \
+        curl --output /defaults/adf-workshop.zip "${ADFWORKSHOP_BETAURL}" && \
+        unzip /defaults/adf-workshop.zip -d /opt/ADF-Workshop/; \
+    else \
+        echo "adf-workshop" $(basename ${ADFWORKSHOP_DOWNLOAD} .zip | cut -d ":" -f 2) >> /VERSIONS && \
+        curl --output /defaults/adf-workshop.zip "${ADFWORKSHOP_BASEURL}/${ADFWORKSHOP_DOWNLOAD}" && \
+        unzip /defaults/adf-workshop.zip -d /opt/; \
+    fi
+    
 # Pull base image.
 FROM jlesage/baseimage-gui:ubuntu-20.04-v4
 
