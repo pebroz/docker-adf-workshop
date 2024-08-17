@@ -61,7 +61,7 @@ RUN \
     fi
     
 # Pull base image.
-FROM jlesage/baseimage-gui:ubuntu-20.04-v4
+FROM jlesage/baseimage-gui:ubuntu-22.04-v4
 
 RUN \
     LC_ALL=en_US.UTF-8 && LANG=en_US.UTF-8 && LANG=C && \
@@ -79,7 +79,9 @@ RUN \
     curl -s https://dl.winehq.org/wine-builds/winehq.key | apt-key add - && \
     apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -c -s) main" && \
     apt-get update && \
-    apt-get install -y --no-install-recommends wine wine32 && \
+    apt-get install -y --no-install-recommends wine wine32 cabextract && \
+    curl -o /usr/bin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks && \
+    chmod +x /usr/bin/winetricks && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* && \
     echo Finished
@@ -95,6 +97,7 @@ RUN \
     export ADFWORKSHOP_VERSION="$(grep adf-workshop /VERSIONS | cut -d'-' -f4-)" && \
     set-cont-env APP_NAME "ADF-Workshop" && \
     set-cont-env APP_VERSION "$ADFWORKSHOP_VERSION" && \
+    set-cont-env TAKE_CONFIG_OWNERSHIP "0" && \
     set-cont-env DOCKER_IMAGE_VERSION "$DOCKER_IMAGE_VERSION" && \
     WINDOW_NAME="ADF-Workshop" && \
     set-cont-env WINDOW_NAME "ADF-Workshop ($ADFWORKSHOP_VERSION) \/config" && \
