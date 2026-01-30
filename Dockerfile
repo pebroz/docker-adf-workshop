@@ -1,7 +1,5 @@
 # ADF-Workshop Dockerfile
 #
-# https://www.tosecdev.org/downloads/category/25-ADF-Workshop
-#
 # NOTES:
 #   - We are using WineHQ.
 #
@@ -80,7 +78,7 @@ RUN \
     fi
     
 # Pull base image.
-FROM jlesage/baseimage-gui:ubuntu-22.04-v4
+FROM jlesage/baseimage-gui:ubuntu-24.04-v4
 
 RUN \
     LC_ALL=en_US.UTF-8 && LANG=en_US.UTF-8 && LANG=C && \
