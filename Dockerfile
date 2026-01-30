@@ -15,7 +15,7 @@ ARG DOCKER_IMAGE_VERSION=1.0.0-3.6.1
 ARG ADFWORKSHOP_URL=https://www.tosecdev.org/downloads/category/25-adf-workshop
 ARG ADFWORKSHOP_BASEURL=https://www.tosecdev.org
 ARG ADFWORKSHOP_VERSION=stable
-ARG ADFWORKSHOP_BETAURL=ftp://ftp@ftp.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Main%20program/ADF-Workshop_20220402.zip
+ARG ADFWORKSHOP_BETAURL=ftp://ftp@ftp.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Main%20program/ADF-Workshop_v20240501.zip
 
 
 # Download ADF-Workshop.
