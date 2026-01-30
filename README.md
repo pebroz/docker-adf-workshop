@@ -2,6 +2,13 @@
 Latest ADF-Workshop by Crashdisk running inside a docker image. Application written by Crashdisk, databases by Crashdisk.
 Big thanks to the Amiga and TOSEC community.
 
+# Editions (tags)
+* 0day is the latest build from the development thread over at EAB.
+* beta is the latest published build on regular distribution channels.
+* stable is the version published on the TOSEC homepage.
+
+Expect some delays as I do manual mirror of some of the files, due to download restrictions.
+
 # To do
 * ~~ANSI codes (verified to work with winetricks riched20 on macos)~~
 * ~~DB Update from EAB~~
