@@ -3,10 +3,11 @@ Latest ADF-Workshop by Crashdisk running inside a docker image
 
 # To do
 * ~~ANSI codes (verified to work with winetricks riched20 on macos)~~
-* DB Update from EAB
+* ~~DB Update from EAB~~
 * ~~Mountable folders~~
 * ~~Beta support~~
 * ~~Monospaced font to better support ASCII tables and file listings~~
+* Open file default folder
 
 # Based on
 * [jlesage/docker-baseimage-gui](https://github.com/jlesage/docker-baseimage-gui/)
