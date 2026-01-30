@@ -6,35 +6,28 @@
 #   - We are using WineHQ.
 #
 # VERSIONS:
-# latest - Latest stable version from TOSEC Project Homepage
+# stable - Latest stable version from TOSEC Project Homepage
 # beta - Crashdisk beta version
+# 0day - Crashdisk "0-Day" version please see: https://eab.abime.net/showthread.php?t=71922
 
 ARG DOCKER_IMAGE_VERSION=1.0.0-3.6.1
 
-# Define software download URLs.
+FROM alpine:3.17 AS adfw
 ARG ADFWORKSHOP_URL=https://www.tosecdev.org/downloads/category/25-adf-workshop
 ARG ADFWORKSHOP_BASEURL=https://www.tosecdev.org
 ARG ADFWORKSHOP_VERSION=stable
-ARG ADFWORKSHOP_BETAURL=ftp://ftp@ftp.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Main%20program/ADF-Workshop_v20240501.zip
-ARG ADFWORKSHOP_0DAYURL=ftp://ftp@ftp2.grandis.nu/~Uploads/Crashdisk/ADF-Workshop_v20260112.zip
-ARG ADFWORKSHOP_DB_WAREZSCENE=ftp://ftp@ftp2.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Database%20v12%20for%20ADFW%20v202x/Unrenamed%20-%20Warez%20scene%20(v2024-08-16).zip
-ARG ADFWORKSHOP_DB_TOSEC=ftp://ftp@ftp2.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Database%20v12%20for%20ADFW%20v202x/TOSEC%20(v2024-05-17).zip
-ARG ADFWORKSHOP_DB_CRASHDISK=ftp://ftp@ftp2.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Database%20v12%20for%20ADFW%20v202x/NonTOSEC%20-%20Crashdisk%20(v2024-07-07).zip
-ARG ADFWORKSHOP_DB_COMMERCIAL=ftp://ftp@ftp2.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Database%20v12%20for%20ADFW%20v202x/Unrenamed%20-%20Commercial%20CD%20(v2023-03-22).zip
-ARG ADFWORKSHOP_DB_DEMOSCENE=ftp://ftp@ftp2.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Database%20v12%20for%20ADFW%20v202x/Unrenamed_-_WebRip_-_Demo_scene_(v2022-05-12).zip
-ARG ADFWORKSHOP_DB_VARIOUSCOLLECTIONS=ftp://ftp@ftp2.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Database%20v12%20for%20ADFW%20v202x/ADFW_Databases_V12_VariousDiskCollections_20220803.zip
-ARG ADFWORKSHOP_DB_YORI=ftp://ftp@ftp2.grandis.nu/Non%20Amiga/Tools%20for%20Amiga/ADF-Workshop/Database%20v12%20for%20ADFW%20v202x/Unrenamed_-_Yori_(v2021-05-05).zip
-
+ARG ADFWORKSHOP_BETAURL=https://cellfi.sh/dat/adf/ADF-Workshop_v20240501.zip
+ARG ADFWORKSHOP_0DAYURL=https://cellfi.sh/dat/adf/ADF-Workshop_v20260112.zip
+ARG ADFWORKSHOP_DB_WAREZSCENE=https://cellfi.sh/dat/adf/Unrenamed%20-%20Warez%20scene%20(v2024-08-16).zip
+ARG ADFWORKSHOP_DB_TOSEC=https://cellfi.sh/dat/adf/TOSEC%20(v2024-05-17).zip
+ARG ADFWORKSHOP_DB_CRASHDISK=https://cellfi.sh/dat/adf/NonTOSEC%20-%20Crashdisk%20(v2024-07-07).zip
+ARG ADFWORKSHOP_DB_COMMERCIAL=https://cellfi.sh/dat/adf/Unrenamed%20-%20Commercial%20CD%20(v2023-03-22).zip
+ARG ADFWORKSHOP_DB_DEMOSCENE=https://cellfi.sh/dat/adf/Unrenamed_-_WebRip_-_Demo_scene_(v2022-05-12).zip
+ARG ADFWORKSHOP_DB_VARIOUSCOLLECTIONS=https://cellfi.sh/dat/adf/ADFW_Databases_V12_VariousDiskCollections_20220803.zip
+ARG ADFWORKSHOP_DB_YORI=https://cellfi.sh/dat/adf/Unrenamed_-_Yori_(v2021-05-05).zip
 # Download ADF-Workshop.
-FROM alpine:3.17 AS adfw
-ARG ADFWORKSHOP_URL
-ARG ADFWORKSHOP_BASEURL
-ARG ADFWORKSHOP_VERSION
-ARG ADFWORKSHOP_BETAURL
-ARG ADFWORKSHOP_0DAYURL
-
 RUN \
-    apk --no-cache add curl && \
+    apk --no-cache add curl unzip && \
     # Get desired version of ADF-Workshop
     if [ "$ADFWORKSHOP_VERSION" = "beta" ]; then \
         ADFWORKSHOP_DOWNLOAD=${ADFWORKSHOP_BETAURL} && \
@@ -61,15 +54,16 @@ RUN \
     fi && \
     # Document, download and extract the desired version of ADF-Workshop
     mkdir -p /defaults/ && \
-    if [ "$ADFWORKSHOP_VERSION" = "beta" ]; then \
+    if [ "$ADFWORKSHOP_VERSION" = "beta" ] || [ "$ADFWORKSHOP_VERSION" = "0day" ]; then \
         echo "adf-workshop" $(basename ${ADFWORKSHOP_DOWNLOAD} .zip | cut -d "_" -f 2) >> /VERSIONS && \
-        curl --output /defaults/adf-workshop.zip "${ADFWORKSHOP_BETAURL}" && \
-        unzip /defaults/adf-workshop.zip -d /opt/ADF-Workshop/; \
+        curl --output /defaults/adf-workshop.zip "${ADFWORKSHOP_DOWNLOAD}" && \
+        unzip /defaults/adf-workshop.zip -d /opt/; \
     else \
         echo "adf-workshop" $(basename ${ADFWORKSHOP_DOWNLOAD} .zip | cut -d ":" -f 2) >> /VERSIONS && \
         curl --output /defaults/adf-workshop.zip "${ADFWORKSHOP_BASEURL}/${ADFWORKSHOP_DOWNLOAD}" && \
         unzip /defaults/adf-workshop.zip -d /opt/; \
-    fi && \
+    fi
+RUN \
     # Download ADF-Workshop databases
     if [ "$ADFWORKSHOP_VERSION" = "beta" ] || [ "$ADFWORKSHOP_VERSION" = "0day" ]; then \
         mkdir -p /defaults/databases/ && \
@@ -83,7 +77,7 @@ RUN \
         for zip_file in /defaults/databases/*.zip; do \
             unzip -o "$zip_file" -d /opt/ADF-Workshop/database_ADF/; \
         done; \
-    fi && \
+    fi
     
 # Pull base image.
 FROM jlesage/baseimage-gui:ubuntu-22.04-v4

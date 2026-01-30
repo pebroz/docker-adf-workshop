@@ -1,5 +1,6 @@
 # docker-adf-workshop
-Latest ADF-Workshop by Crashdisk running inside a docker image
+Latest ADF-Workshop by Crashdisk running inside a docker image. Application written by Crashdisk, databases by Crashdisk.
+Big thanks to the Amiga and TOSEC community.
 
 # To do
 * ~~ANSI codes (verified to work with winetricks riched20 on macos)~~
@@ -8,6 +9,7 @@ Latest ADF-Workshop by Crashdisk running inside a docker image
 * ~~Beta support~~
 * ~~Monospaced font to better support ASCII tables and file listings~~
 * Open file default folder
+* Proper container tags
 
 # Based on
 * [jlesage/docker-baseimage-gui](https://github.com/jlesage/docker-baseimage-gui/)
